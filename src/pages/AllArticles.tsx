@@ -55,8 +55,10 @@ const AllArticles = () => {
   const handleArticleClick = (slug: string) => {
     if (slug === "dermatillomania") {
       navigate("/dermatillomania");
+      window.scrollTo(0, 0);
     } else if (slug === "mitochondria") {
       navigate("/mitochondria");
+      window.scrollTo(0, 0);
     }
   };
 

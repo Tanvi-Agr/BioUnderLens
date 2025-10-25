@@ -36,7 +36,7 @@ export const FeaturedBlogs = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-6 md:gap-8 mb-12">
+          <div className="grid md:grid-cols-3 gap-6 md:gap-8 mb-12 md:mr-8">
             {blogPosts.map((post, index) => <Card key={index} className="group hover:shadow-xl transition-all duration-300 overflow-hidden scale-95 md:scale-100">
                 <div className="relative overflow-hidden">
                   <img src={post.image} alt={post.title} className="w-full h-40 md:h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -76,8 +76,10 @@ export const FeaturedBlogs = () => {
                     onClick={() => {
                       if (post.slug === "dermatillomania") {
                         navigate("/dermatillomania");
+                        window.scrollTo(0, 0);
                       } else if (post.slug === "mitochondria") {
                         navigate("/mitochondria");
+                        window.scrollTo(0, 0);
                       }
                     }}
                   >
