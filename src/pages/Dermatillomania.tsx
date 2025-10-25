@@ -79,21 +79,72 @@ const Dermatillomania = () => {
             Skin picking disorder, also called dermatillomania or excoriation disorder, is when a person feels a strong urge to pick at their skin. Target areas are often around the face, fingers, or arms and sometimes it leads to bleeding, scars or post-inflammatory hyperpigmentation. It sounds like a repetitive habit that's rather painful but if that's the case, then why is it so relieving and so difficult to get rid of? There's a lot more going on under the surface, especially in the brain.
           </p>
 
-          <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-            Let's start there. The brain has different regions that all work together to help us manage emotions, control our impulses, and respond to rewards (like things that feel good or relieve stress). One such part, called the nucleus accumbens (NAc), helps us feel motivation or pleasure when we anticipate something rewarding like eating a favorite food or finishing a task via the release of dopamine. In people with dermatillomania, the NAc doesn't respond as strongly when a reward is expected but once the person picks their skin, a strong dopamine release gets triggered causing instant gratification or relief. In other words, the brain doesn't build up much excitement about anything before picking—but it lights up intensely during or after.
-          </p>
+          <div className="relative mb-6">
+            {/* Image positioned on the left side */}
+            <div className="float-left mr-6 mb-4 w-48">
+              <img 
+                src="/nucleus_accumbens.png" 
+                alt="MRI scan showing the nucleus accumbens region of the brain"
+                className="w-full h-auto rounded-lg shadow-md"
+              />
+              <p className="text-xs text-gray-500 text-center mt-1 italic">
+                Nucleus Accumbens
+              </p>
+            </div>
+            
+            {/* 2nd paragraph text that flows around the image */}
+            <p className="text-lg text-gray-700 leading-relaxed">
+              Let's start there. The brain has different regions that all work together to help us manage emotions, control our impulses, and respond to rewards (like things that feel good or relieve stress). One such part, called the <strong>nucleus accumbens (NAc)</strong>, helps us feel motivation or pleasure when we anticipate something rewarding like eating a favorite food or finishing a task via the release of dopamine. In people with dermatillomania, the NAc doesn't respond as strongly when a reward is expected but once the person picks their skin, a strong dopamine release gets triggered causing instant gratification or relief. In other words, the brain doesn't build up much excitement about anything before picking—but it lights up intensely during or after.
+            </p>
+            
+            {/* Clear floats */}
+            <div className="clear-both"></div>
+          </div>
 
           <p className="text-lg text-gray-700 mb-6 leading-relaxed">
             But where does this begin and what causes it? Before an episode, many people experience anxiety, stress, sadness, boredom, or frustration. Picking becomes a way to release that pressure. When the act of picking reduces those uncomfortable emotions, the brain remembers that relief—and so the cycle repeats. This is called negative reinforcement: the action takes away a negative feeling hence it becomes more likely to happen again, creating a vicious cycle.
           </p>
 
-          <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-            Other important areas of the brain that help with self-control and decision-making like the anterior cingulate cortex and orbitofrontal cortex stop communicating properly. Think of these regions as internal brakes that help us stop or resist an urge. In people with dermatillomania, these "brake systems" are weakened or disorganized, making it much harder to stop once the urge begins, even if the person truly wants to.
-          </p>
-
-          <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-            In the short term, skin picking provides a sense of relief, but is usually followed by regret, embarrassment, or guilt which is often the reason why many avoid talking about it or seeking help. Over time, repeated picking can damage the skin and make one feel isolated or ashamed due to changes in their looks and their supposed lack of control. The brain becomes more "wired" to use picking as a way to cope with emotions, making it even harder to break free.
-          </p>
+          <div className="relative mb-6">
+            {/* Images positioned on the right side */}
+            <div className="float-right ml-6 mb-4 w-48">
+              <div className="space-y-4">
+                <div>
+                  <img 
+                    src="/MRI_orbitofrontal_cortex.png" 
+                    alt="MRI scan showing the orbitofrontal cortex region of the brain"
+                    className="w-full h-auto rounded-lg shadow-md"
+                  />
+                  <p className="text-xs text-gray-500 text-center mt-1 italic">
+                    Orbitofrontal Cortex
+                  </p>
+                </div>
+                <div>
+                  <img 
+                    src="/MRI_anterior_cingulate_cortex.png" 
+                    alt="MRI scan showing the anterior cingulate cortex region of the brain"
+                    className="w-full h-auto rounded-lg shadow-md"
+                  />
+                  <p className="text-xs text-gray-500 text-center mt-1 italic">
+                    Anterior Cingulate Cortex
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* 4th paragraph text that flows around images */}
+            <p className="text-lg text-gray-700 leading-relaxed mb-6">
+              Other important areas of the brain that help with self-control and decision-making like the anterior cingulate cortex and orbitofrontal cortex stop communicating properly. Think of these regions as internal brakes that help us stop or resist an urge. In people with dermatillomania, these "brake systems" are weakened or disorganized, making it much harder to stop once the urge begins, even if the person truly wants to.
+            </p>
+            
+            {/* 5th paragraph that can wrap around the images */}
+            <p className="text-lg text-gray-700 leading-relaxed">
+              In the short term, skin picking provides a sense of relief, but is usually followed by regret, embarrassment, or guilt which is often the reason why many avoid talking about it or seeking help. Over time, repeated picking can damage the skin and make one feel isolated or ashamed due to changes in their looks and their supposed lack of control. The brain becomes more "wired" to use picking as a way to cope with emotions, making it even harder to break free.
+            </p>
+            
+            {/* Clear floats */}
+            <div className="clear-both"></div>
+          </div>
 
           <p className="text-lg text-gray-700 mb-6 leading-relaxed">
             Due to the lack of prevalancy compared to other psychiatric conditions such as depression, schizophrenia, and OCD, dermatillomania is under-researched—even though it often coexists with these conditions. But understanding the hidden processes behind it and asking "why?" is the first step towards realization, healing and change.
