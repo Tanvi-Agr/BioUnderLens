@@ -3,33 +3,21 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import { useArticleData } from "@/hooks/useArticleData";
 
 const Dermatillomania = () => {
   const navigate = useNavigate();
-  const [likes, setLikes] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
   const [comment, setComment] = useState("");
-  const [comments, setComments] = useState<string[]>([]);
+  const { likes, isLiked, comments, handleLike, handleSubmitComment, handleDeleteComment, canDeleteComment } = useArticleData('dermatillomania');
 
-  const handleLike = () => {
-    if (isLiked) {
-      setLikes(likes - 1);
-      setIsLiked(false);
-    } else {
-      setLikes(likes + 1);
-      setIsLiked(true);
-    }
-  };
-
-  const handleSubmitComment = () => {
-    if (comment.trim()) {
-      setComments([...comments, comment]);
+  const onSubmitComment = () => {
+    if (handleSubmitComment(comment)) {
       setComment("");
     }
   };
 
-  const handleDeleteComment = (index: number) => {
-    setComments(comments.filter((_, i) => i !== index));
+  const onDeleteComment = (commentId: string) => {
+    handleDeleteComment(commentId);
   };
 
   return (
@@ -50,7 +38,7 @@ const Dermatillomania = () => {
           <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
-              <span>July 12, 2025</span>
+              <span>October 18, 2025</span>
             </div>
             <div className="flex items-center gap-1">
               <Clock className="h-4 w-4" />
@@ -180,7 +168,7 @@ const Dermatillomania = () => {
                 rows={3}
               />
               <Button 
-                onClick={handleSubmitComment}
+                onClick={onSubmitComment}
                 disabled={!comment.trim()}
                 className="self-end"
               >
@@ -190,19 +178,21 @@ const Dermatillomania = () => {
 
             {/* Comments List */}
             {comments.length > 0 && (
-              <div className="space-y-4 mt-6">
-                {comments.map((comment, index) => (
-                  <div key={index} className="bg-white p-4 rounded-lg border flex items-center justify-between">
-                    <p className="text-gray-700 mr-4 flex-1">{comment}</p>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => handleDeleteComment(index)}
-                      className="text-gray-400 hover:text-red-500"
-                      aria-label="Delete comment"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+              <div className="space-y-3 mt-6">
+                {comments.map((commentItem) => (
+                  <div key={commentItem.id} className="bg-gray-50 p-3 rounded-lg border border-gray-200 flex items-start justify-between group hover:bg-gray-100 transition-colors">
+                    <p className="text-gray-700 text-sm mr-3 flex-1 leading-relaxed">{commentItem.text}</p>
+                    {canDeleteComment(commentItem.id) && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => onDeleteComment(commentItem.id)}
+                        className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6"
+                        aria-label="Delete comment"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
                   </div>
                 ))}
               </div>

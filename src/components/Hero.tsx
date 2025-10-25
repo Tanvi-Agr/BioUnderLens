@@ -40,9 +40,5 @@ export const Hero = () => {
         </div>
       </div>
       
-      {/* Floating elements for visual interest */}
-      <div className="absolute top-20 left-10 w-2 h-2 bg-emerald-300 rounded-full animate-pulse"></div>
-      <div className="absolute bottom-32 right-16 w-3 h-3 bg-blue-300 rounded-full animate-pulse delay-1000"></div>
-      <div className="absolute top-1/3 right-8 w-1 h-1 bg-white rounded-full animate-pulse delay-500"></div>
     </section>;
 };
