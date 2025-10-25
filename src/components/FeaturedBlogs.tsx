@@ -19,7 +19,7 @@ export const FeaturedBlogs = () => {
     excerpt: "Uncovering the neurological and emotional mechanisms that make dermatillomania a difficult disorder to overcome.",
     date: "2025-07-12",
     readTime: "2 min read",
-    image: "/public/dermatillomania-brain-skin.png",
+    image: "dermatillomania-brain-skin.png",
     category: "Neuroscience",
     slug: "dermatillomania"
   }];
