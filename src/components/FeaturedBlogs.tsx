@@ -7,7 +7,7 @@ export const FeaturedBlogs = () => {
   const navigate = useNavigate();
   const currentTheme = "Cellular Biology";
   const blogPosts = [{
-    title: "The Powerhouse Myth: Why Mitochondria Are More Than Energy Factories.",
+    title: "The Powerhouse Myth: Why Mitochondria Are More Than Energy Factories",
     excerpt: "Exploring the diverse roles of mitochondria beyond ATP production, from cellular signaling to programmed cell death.",
     date: "2025-10-25",
     readTime: "3 min read",
