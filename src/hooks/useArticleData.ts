@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/lib/supabase';
 
 interface Comment {
   id: string;
@@ -8,35 +9,20 @@ interface Comment {
   timestamp: number;
 }
 
-interface ArticleData {
-  likes: number;
-  likedBy: string[];
-  comments: Comment[];
-}
-
-const STORAGE_KEY = 'articleData';
 const DISPLAY_NAME_KEY = 'displayName';
+const DEVICE_ID_KEY = 'deviceId';
 
-// Get a persistent device ID from localStorage
 const getDeviceId = (): string => {
-  const deviceIdKey = 'deviceId';
-  let deviceId = localStorage.getItem(deviceIdKey);
-  
+  let deviceId = localStorage.getItem(DEVICE_ID_KEY);
   if (!deviceId) {
-    deviceId = `device_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-    localStorage.setItem(deviceIdKey, deviceId);
+    deviceId = `device_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    localStorage.setItem(DEVICE_ID_KEY, deviceId);
   }
-  
   return deviceId;
 };
 
-const getDisplayName = (): string | null => {
-  return localStorage.getItem(DISPLAY_NAME_KEY);
-};
-
-const setDisplayName = (name: string) => {
-  localStorage.setItem(DISPLAY_NAME_KEY, name);
-};
+const getDisplayName = (): string | null => localStorage.getItem(DISPLAY_NAME_KEY);
+const setDisplayName = (name: string) => localStorage.setItem(DISPLAY_NAME_KEY, name);
 
 export const useArticleData = (articleSlug: string) => {
   const [likes, setLikes] = useState(0);
@@ -45,140 +31,107 @@ export const useArticleData = (articleSlug: string) => {
   const [deviceId] = useState(() => getDeviceId());
   const [displayName, setDisplayNameState] = useState<string | null>(() => getDisplayName());
 
-  // Load data from localStorage on mount
-  useEffect(() => {
-    try {
-      const storedData = localStorage.getItem(STORAGE_KEY);
-      if (storedData) {
-        const allArticlesData = JSON.parse(storedData);
-        const articleData: ArticleData = allArticlesData[articleSlug] || { likes: 0, likedBy: [], comments: [] };
-        
-        setLikes(articleData.likes || 0);
-        setIsLiked(articleData.likedBy?.includes(deviceId) || false);
-        setComments(articleData.comments || []);
-      }
-    } catch (error) {
-      console.error('Error loading article data:', error);
-    }
+  const refresh = useCallback(async () => {
+    // Likes: count and device status
+    const { count: likeCount } = await supabase
+      .from('likes_per_device')
+      .select('*', { count: 'exact', head: true })
+      .eq('article_id', articleSlug);
+
+    setLikes(likeCount || 0);
+
+    const { data: deviceLike } = await supabase
+      .from('likes_per_device')
+      .select('device_id')
+      .eq('article_id', articleSlug)
+      .eq('device_id', deviceId)
+      .maybeSingle();
+
+    setIsLiked(!!deviceLike);
+
+    // Comments list
+    const { data: rows } = await supabase
+      .from('comments')
+      .select('id, device_id, author_name, text, created_at')
+      .eq('article_id', articleSlug)
+      .order('created_at', { ascending: true });
+
+    const mapped: Comment[] = (rows || []).map((r: any) => ({
+      id: r.id,
+      text: r.text,
+      author: r.device_id,
+      authorName: r.author_name,
+      timestamp: r.created_at ? new Date(r.created_at).getTime() : Date.now(),
+    }));
+    setComments(mapped);
   }, [articleSlug, deviceId]);
 
-  // Save data to localStorage
-  const saveData = (data: ArticleData) => {
-    try {
-      const existingData = localStorage.getItem(STORAGE_KEY);
-      const allArticlesData = existingData ? JSON.parse(existingData) : {};
-      allArticlesData[articleSlug] = data;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(allArticlesData));
-    } catch (error) {
-      console.error('Error saving article data:', error);
-    }
-  };
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
-  const ensureDisplayName = () => {
+  const ensureDisplayName = (): string | null => {
     let name = getDisplayName();
     if (!name) {
-      name = window.prompt('Enter your short name (shown on comments):')?.trim() || '';
+      name = window.prompt('Enter your short name to show on comments (or leave blank for Anonymous):')?.trim() || '';
       if (name) {
         setDisplayName(name);
         setDisplayNameState(name);
       }
     }
-    return name || null;
+    return name || 'Anonymous';
   };
 
-  const handleLike = () => {
-    const storedData = localStorage.getItem(STORAGE_KEY);
-    const allArticlesData = storedData ? JSON.parse(storedData) : {};
-    const articleData: ArticleData = allArticlesData[articleSlug] || { likes: 0, likedBy: [], comments: [] };
-    
-    const likedBy = articleData.likedBy || [];
-    const isCurrentlyLiked = likedBy.includes(deviceId);
-    
-    let newLikes: number;
-    let newLikedBy: string[];
-    
-    if (isCurrentlyLiked) {
-      // Unlike: decrease likes and remove device from likedBy
-      newLikes = Math.max(0, likes - 1);
-      newLikedBy = likedBy.filter((id: string) => id !== deviceId);
-      setIsLiked(false);
+  const handleLike = async () => {
+    if (isLiked) {
+      // Unlike: remove device row
+      await supabase
+        .from('likes_per_device')
+        .delete()
+        .eq('article_id', articleSlug)
+        .eq('device_id', deviceId);
     } else {
-      // Like: increase likes and add device to likedBy
-      newLikes = likes + 1;
-      newLikedBy = [...likedBy, deviceId];
-      setIsLiked(true);
+      // Like: add device row (idempotent upsert by unique constraint)
+      await supabase
+        .from('likes_per_device')
+        .upsert({ article_id: articleSlug, device_id: deviceId }, { onConflict: 'article_id,device_id' });
     }
-    
-    setLikes(newLikes);
-    
-    // Save to localStorage
-    const updatedData: ArticleData = {
-      ...articleData,
-      likes: newLikes,
-      likedBy: newLikedBy
-    };
-    saveData(updatedData);
+    await refresh();
   };
 
-  const handleSubmitComment = (commentText: string) => {
-    if (commentText.trim()) {
-      const name = displayName || ensureDisplayName();
-      if (!name) return false;
+  const handleSubmitComment = async (commentText: string) => {
+    if (!commentText.trim()) return false;
+    const name = ensureDisplayName();
 
-      const newComment: Comment = {
-        id: `comment_${Date.now()}_${Math.random()}`,
-        text: commentText,
-        author: deviceId,
-        authorName: name,
-        timestamp: Date.now()
-      };
-      
-      const storedData = localStorage.getItem(STORAGE_KEY);
-      const allArticlesData = storedData ? JSON.parse(storedData) : {};
-      const articleData: ArticleData = allArticlesData[articleSlug] || { likes: 0, likedBy: [], comments: [] };
-      
-      const updatedComments = [...comments, newComment];
-      setComments(updatedComments);
-      
-      // Save to localStorage
-      const updatedData: ArticleData = {
-        ...articleData,
-        comments: updatedComments
-      };
-      saveData(updatedData);
-      
-      return true;
-    }
-    return false;
+    await supabase.from('comments').insert({
+      article_id: articleSlug,
+      device_id: deviceId,
+      author_name: name || 'Anonymous',
+      text: commentText.trim(),
+    });
+
+    await refresh();
+    return true;
   };
 
-  const handleDeleteComment = (commentId: string) => {
-    const comment = comments.find(c => c.id === commentId);
-    
-    // Only allow deletion if user is the author
-    if (comment && comment.author === deviceId) {
-      const updatedComments = comments.filter(c => c.id !== commentId);
-      setComments(updatedComments);
-      
-      // Save to localStorage
-      const storedData = localStorage.getItem(STORAGE_KEY);
-      const allArticlesData = storedData ? JSON.parse(storedData) : {};
-      const articleData: ArticleData = allArticlesData[articleSlug] || { likes: 0, likedBy: [], comments: [] };
-      
-      const updatedData: ArticleData = {
-        ...articleData,
-        comments: updatedComments
-      };
-      saveData(updatedData);
-      
-      return true;
-    }
-    return false;
+  const handleDeleteComment = async (commentId: string) => {
+    // Only allow deletion for comments by this device
+    const target = comments.find(c => c.id === commentId);
+    if (!target || target.author !== deviceId) return false;
+
+    await supabase
+      .from('comments')
+      .delete()
+      .eq('id', commentId)
+      .eq('device_id', deviceId);
+
+    await refresh();
+    return true;
   };
 
   const canDeleteComment = (commentId: string) => {
-    const comment = comments.find(c => c.id === commentId);
-    return comment && comment.author === deviceId;
+    const c = comments.find(c => c.id === commentId);
+    return !!c && c.author === deviceId;
   };
 
   const setUserDisplayName = (name: string) => {
@@ -197,6 +150,6 @@ export const useArticleData = (articleSlug: string) => {
     handleLike,
     handleSubmitComment,
     handleDeleteComment,
-    canDeleteComment
+    canDeleteComment,
   };
 };

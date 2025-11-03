@@ -8,7 +8,7 @@ import { useArticleData } from "@/hooks/useArticleData";
 const Dermatillomania = () => {
   const navigate = useNavigate();
   const [comment, setComment] = useState("");
-  const { likes, isLiked, comments, handleLike, handleSubmitComment, handleDeleteComment, canDeleteComment } = useArticleData('dermatillomania');
+  const { likes, isLiked, comments, handleLike, handleSubmitComment, handleDeleteComment, canDeleteComment, displayName, setUserDisplayName } = useArticleData('dermatillomania');
 
   const onSubmitComment = () => {
     if (handleSubmitComment(comment)) {
@@ -18,6 +18,13 @@ const Dermatillomania = () => {
 
   const onDeleteComment = (commentId: string) => {
     handleDeleteComment(commentId);
+  };
+
+  const onSetName = () => {
+    const name = window.prompt('Enter your short name (leave blank for Anonymous):', displayName || '')?.trim();
+    if (name !== undefined) {
+      setUserDisplayName(name);
+    }
   };
 
   return (
@@ -154,7 +161,11 @@ const Dermatillomania = () => {
 
         {/* Comments Section */}
         <div className="mt-12 border-t pt-8">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">Comments</h3>
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">Comments</h3>
+          <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
+            <div>Commenting as: <span className="font-medium text-gray-700">{displayName || 'Anonymous'}</span></div>
+            <button className="underline hover:text-emerald-600" onClick={onSetName}>Set name</button>
+          </div>
           <p className="text-sm text-gray-600 mb-6">Share your thoughts, suggestions, or questions below!</p>
           
           <div className="space-y-4">
