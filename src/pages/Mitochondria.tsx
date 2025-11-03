@@ -82,7 +82,7 @@ const Mitochondria = () => {
           <h2 className="text-3xl font-bold text-gray-900 mb-4 mt-8">Immune Defense</h2>
           
           <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-            The mitochondria's very own DNA (<strong>mtDNA</strong>), left over from their bacterial ancestry, plays a key role in setting off alarms to alert the immune system of due to their resemblance with bacterial DNA. In response to cellular stress or viral infections, mtDNA can leak out of the organelle which is immediately recognized by the enzyme cGAS hence activating the protein STING (Stimulator of Interferon Genes). Moments later interferons (molecules that interfere with virus replication thus inhibiting it) and inflammatory signals are produced, activating our defense system to fight the pathogens. In addition to the mitochondria's role as a sensor, it also fosters an army of its own and sends out its soldiers when danger arises. These soldiers are called reactive oxygen species (<strong>ROS</strong>) and these molecules directly aid in killing the invading pathogens via oxidative damage to their cellular components, for example braking the double strand of the DNA, as well as waking up immune cells around them which further trigger the inflammation required to battle the enemies.
+            The mitochondria's very own DNA (<strong>mtDNA</strong>), left over from their bacterial ancestry, plays a key role in setting off alarms to alert the immune system of danger due to their resemblance to bacterial DNA. In response to cellular stress or viral infections, mtDNA can leak out of the organelle which is immediately recognized by the enzyme cGAS hence activating the protein STING (Stimulator of Interferon Genes). Moments later interferons (molecules that interfere with virus replication thus inhibiting it) and inflammatory signals are produced, activating our defense system to fight the pathogens. In addition to the mitochondria's role as a sensor, it also fosters an army of its own and sends out its soldiers when danger arises. These soldiers are called reactive oxygen species (<strong>ROS</strong>) and these molecules directly aid in killing the invading pathogens via oxidative damage to their cellular components, for example braking the double strand of the DNA, as well as waking up immune cells around them which further trigger the inflammation required to battle the enemies.
           </p>
 
           <p className="text-lg text-gray-700 mb-6 leading-relaxed">
@@ -131,19 +131,24 @@ const Mitochondria = () => {
             {comments.length > 0 && (
               <div className="space-y-3 mt-6">
                 {comments.map((commentItem) => (
-                  <div key={commentItem.id} className="bg-gray-50 p-3 rounded-lg border border-gray-200 flex items-start justify-between group hover:bg-gray-100 transition-colors">
-                    <p className="text-gray-700 text-sm mr-3 flex-1 leading-relaxed">{commentItem.text}</p>
-                    {canDeleteComment(commentItem.id) && (
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => onDeleteComment(commentItem.id)}
-                        className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6"
-                        aria-label="Delete comment"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    )}
+                  <div key={commentItem.id} className="bg-gray-50 p-3 rounded-lg border border-gray-200 group hover:bg-gray-100 transition-colors">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="text-xs text-gray-500 mb-1">{commentItem.authorName || 'Anonymous'}</div>
+                        <p className="text-gray-700 text-sm leading-relaxed">{commentItem.text}</p>
+                      </div>
+                      {canDeleteComment(commentItem.id) && (
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => onDeleteComment(commentItem.id)}
+                          className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6"
+                          aria-label="Delete comment"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

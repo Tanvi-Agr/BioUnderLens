@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 interface Comment {
   id: string;
   text: string;
-  author: string;
+  author: string; // device id
+  authorName?: string; // short name
   timestamp: number;
 }
 
@@ -14,6 +15,7 @@ interface ArticleData {
 }
 
 const STORAGE_KEY = 'articleData';
+const DISPLAY_NAME_KEY = 'displayName';
 
 // Get a persistent device ID from localStorage
 const getDeviceId = (): string => {
@@ -28,11 +30,20 @@ const getDeviceId = (): string => {
   return deviceId;
 };
 
+const getDisplayName = (): string | null => {
+  return localStorage.getItem(DISPLAY_NAME_KEY);
+};
+
+const setDisplayName = (name: string) => {
+  localStorage.setItem(DISPLAY_NAME_KEY, name);
+};
+
 export const useArticleData = (articleSlug: string) => {
   const [likes, setLikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [deviceId] = useState(() => getDeviceId());
+  const [displayName, setDisplayNameState] = useState<string | null>(() => getDisplayName());
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -61,6 +72,18 @@ export const useArticleData = (articleSlug: string) => {
     } catch (error) {
       console.error('Error saving article data:', error);
     }
+  };
+
+  const ensureDisplayName = () => {
+    let name = getDisplayName();
+    if (!name) {
+      name = window.prompt('Enter your short name (shown on comments):')?.trim() || '';
+      if (name) {
+        setDisplayName(name);
+        setDisplayNameState(name);
+      }
+    }
+    return name || null;
   };
 
   const handleLike = () => {
@@ -99,10 +122,14 @@ export const useArticleData = (articleSlug: string) => {
 
   const handleSubmitComment = (commentText: string) => {
     if (commentText.trim()) {
+      const name = displayName || ensureDisplayName();
+      if (!name) return false;
+
       const newComment: Comment = {
         id: `comment_${Date.now()}_${Math.random()}`,
         text: commentText,
         author: deviceId,
+        authorName: name,
         timestamp: Date.now()
       };
       
@@ -154,10 +181,19 @@ export const useArticleData = (articleSlug: string) => {
     return comment && comment.author === deviceId;
   };
 
+  const setUserDisplayName = (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    setDisplayName(trimmed);
+    setDisplayNameState(trimmed);
+  };
+
   return {
     likes,
     isLiked,
     comments,
+    displayName,
+    setUserDisplayName,
     handleLike,
     handleSubmitComment,
     handleDeleteComment,

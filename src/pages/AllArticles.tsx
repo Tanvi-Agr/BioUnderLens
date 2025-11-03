@@ -2,37 +2,9 @@ import { ArrowLeft, Calendar, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 
 const AllArticles = () => {
   const navigate = useNavigate();
-
-  // Reset all likes to 0 on component mount (only runs once)
-  useEffect(() => {
-    const resetLikes = () => {
-      try {
-        const storedData = localStorage.getItem('articleData');
-        if (storedData) {
-          const allArticlesData = JSON.parse(storedData);
-          
-          // Reset likes to 0 for all articles while keeping comments and likedBy array
-          Object.keys(allArticlesData).forEach(slug => {
-            allArticlesData[slug] = {
-              ...allArticlesData[slug],
-              likes: 0
-            };
-          });
-          
-          localStorage.setItem('articleData', JSON.stringify(allArticlesData));
-        }
-      } catch (error) {
-        console.error('Error resetting likes:', error);
-      }
-    };
-    
-    // Only reset once on mount
-    resetLikes();
-  }, []);
 
   const blogPosts = [{
     title: "The Powerhouse Myth: Why Mitochondria Are More Than Energy Factories.",
